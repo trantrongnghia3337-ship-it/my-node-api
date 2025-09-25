@@ -56,7 +56,7 @@ sql.connect(config).then(pool => {
         .input('name', sql.NVarChar(100), name)
         .input('createdAt', sql.DateTime, createdAt)
         .query(`
-          INSERT INTO dbo.History (UserID, Name, CreatedAt)
+          INSERT INTO dbo.History (userId, name, createdAt)
           VALUES (@id, @name, @createdAt);
         `);
 
