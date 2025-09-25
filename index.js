@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Cấu hình kết nối SQL Server từ .env
+// Cấu hình kết nối SQL Server
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -16,18 +16,17 @@ const config = {
   database: process.env.DB_NAME,
   options: {
     encrypt: false,
-    trustServerCertificate: true,
-    instanceName: process.env.DB_INSTANCE  
+    trustServerCertificate: true
   }
 };
 
 // Middleware
 app.use(cors());
-app.use(express.json());  
+app.use(express.json());
 
-// Kết nối SQL Server
+// Kết nối SQL
 sql.connect(config).then(pool => {
-  console.log('Đã kết nối SQL Server');
+  console.log('✅ Đã kết nối SQL Server');
 
   // API: Ghi user và lịch sử
   app.post('/user', async (req, res) => {
@@ -35,13 +34,13 @@ sql.connect(config).then(pool => {
     const createdAt = new Date();
 
     try {
-      // Cập nhật hoặc thêm user vào bảng `users`
+      // Cập nhật hoặc thêm vào dbo.Users
       await pool.request()
-        .input('id', sql.VarChar, id)
-        .input('name', sql.NVarChar, name)
+        .input('id', sql.VarChar(50), id)
+        .input('name', sql.NVarChar(100), name)
         .input('createdAt', sql.DateTime, createdAt)
         .query(`
-          MERGE INTO users AS target
+          MERGE INTO dbo.Users AS target
           USING (SELECT @id AS id, @name AS name) AS source
           ON target.id = source.id
           WHEN MATCHED THEN
@@ -51,42 +50,42 @@ sql.connect(config).then(pool => {
             VALUES (@id, @name, @createdAt);
         `);
 
-      // Ghi vào bảng `history`
+      // Ghi vào dbo.History
       await pool.request()
-        .input('id', sql.VarChar, id)
-        .input('name', sql.NVarChar, name)
+        .input('id', sql.VarChar(50), id)
+        .input('name', sql.NVarChar(100), name)
         .input('createdAt', sql.DateTime, createdAt)
         .query(`
-          INSERT INTO history (userId, name, createdAt)
+          INSERT INTO dbo.History (UserID, Name, CreatedAt)
           VALUES (@id, @name, @createdAt);
         `);
 
-      res.json({ message: 'Đã lưu user và lịch sử thành công!' });
+      res.json({ message: '✅ Đã lưu user và lịch sử thành công!' });
 
     } catch (err) {
-      console.error('Lỗi ghi dữ liệu:', err);
+      console.error('❌ Lỗi ghi dữ liệu:', err);
       res.status(500).json({ error: 'Lỗi ghi dữ liệu vào SQL Server' });
     }
   });
 
-  // API: Lấy toàn bộ lịch sử
+  // API: Lấy lịch sử
   app.get('/history', async (req, res) => {
     try {
       const result = await pool.request().query(`
-        SELECT * FROM history ORDER BY createdAt DESC
+        SELECT * FROM dbo.History ORDER BY CreatedAt DESC
       `);
       res.json(result.recordset);
     } catch (err) {
-      console.error('Lỗi truy vấn:', err);
+      console.error('❌ Lỗi truy vấn:', err);
       res.status(500).json({ error: 'Lỗi truy vấn dữ liệu' });
     }
   });
 
-  // Khởi động server
+  // Khởi động API
   app.listen(port, () => {
-    console.log(`API đang chạy tại http://localhost:${port}`);
+    console.log(`🚀 API đang chạy tại http://localhost:${port}`);
   });
 
 }).catch(err => {
-  console.error('Kết nối SQL Server thất bại:', err);
+  console.error('❌ Kết nối SQL Server thất bại:', err);
 });
