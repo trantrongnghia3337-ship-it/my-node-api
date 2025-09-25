@@ -26,7 +26,7 @@ app.use(express.json());
 
 // Kết nối SQL
 sql.connect(config).then(pool => {
-  console.log('✅ Đã kết nối SQL Server');
+  console.log('Đã kết nối SQL Server');
 
   // API: Ghi user và lịch sử
   app.post('/user', async (req, res) => {
@@ -60,10 +60,10 @@ sql.connect(config).then(pool => {
           VALUES (@id, @name, @createdAt);
         `);
 
-      res.json({ message: '✅ Đã lưu user và lịch sử thành công!' });
+      res.json({ message: 'Đã lưu user và lịch sử thành công!' });
 
     } catch (err) {
-      console.error('❌ Lỗi ghi dữ liệu:', err);
+      console.error('Lỗi ghi dữ liệu:', err);
       res.status(500).json({ error: 'Lỗi ghi dữ liệu vào SQL Server' });
     }
   });
@@ -76,16 +76,16 @@ sql.connect(config).then(pool => {
       `);
       res.json(result.recordset);
     } catch (err) {
-      console.error('❌ Lỗi truy vấn:', err);
+      console.error('Lỗi truy vấn:', err);
       res.status(500).json({ error: 'Lỗi truy vấn dữ liệu' });
     }
   });
 
   // Khởi động API
   app.listen(port, () => {
-    console.log(`🚀 API đang chạy tại http://localhost:${port}`);
+    console.log(`API đang chạy tại http://localhost:${port}`);
   });
 
 }).catch(err => {
-  console.error('❌ Kết nối SQL Server thất bại:', err);
+  console.error('Kết nối SQL Server thất bại:', err);
 });
