@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  server: `${process.env.DB_SERVER}\\${process.env.DB_INSTANCE}`,
+  server: process.env.DB_SERVER,
   port: parseInt(process.env.DB_PORT || '1433'),
   database: process.env.DB_NAME,
   options: {
