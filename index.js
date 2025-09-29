@@ -82,8 +82,8 @@ sql.connect(config).then(pool => {
   });
 
   // Khởi động API
-  app.listen(port,"10.10.163.50", () => {
-    console.log(`API đang chạy tại http://10.10.163.50:${port}`);
+  app.listen(port,"0.0.0.0", () => {
+    console.log(`API đang chạy tại http://0.0.0.0:${port}`);
   });
 
 }).catch(err => {
