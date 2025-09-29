@@ -28,13 +28,13 @@ app.use(express.json());
 sql.connect(config).then(pool => {
   console.log('Đã kết nối SQL Server');
 
-  // API: Ghi user và lịch sử
+  // API Ghi user và lịch sử
   app.post('/user', async (req, res) => {
     const { id, name } = req.body;
     const createdAt = new Date();
 
     try {
-      // Cập nhật hoặc thêm vào dbo.Users
+      // Cập nhật, thêm vào dbo.Users
       await pool.request()
         .input('id', sql.VarChar(50), id)
         .input('name', sql.NVarChar(100), name)
