@@ -28,7 +28,7 @@ app.use(express.json());
 sql.connect(config).then(pool => {
   console.log('Đã kết nối SQL Server');
 
-  // 1. API: Ghi user + lịch sử
+  // API: Ghi user + lịch sử
   app.post('/user', async (req, res) => {
     const { id, name } = req.body;
     const createdAt = new Date();
@@ -68,7 +68,7 @@ sql.connect(config).then(pool => {
     }
   });
 
-  // 2. API: Lấy lịch sử
+  // API: Lấy lịch sử
   app.get('/history', async (req, res) => {
     try {
       const result = await pool.request().query(`
