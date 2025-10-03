@@ -81,7 +81,7 @@ sql.connect(config).then(pool => {
     }
   });
 
-  // ================== MỞ RỘNG CHO ESP32 ==================
+  // ================== MỞ RỘNG ESP32 ==================
   let espCommand = null;
 
   // App gửi lệnh cho ESP qua API
