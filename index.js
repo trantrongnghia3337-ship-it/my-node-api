@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ================== CẤU HÌNH SQL ==================
+// ================== CẤU HÌNH SQL SERVER ==================
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -26,9 +26,39 @@ app.use(express.json());
 
 // ================== MAIN ==================
 sql.connect(config).then(pool => {
-  console.log('Đã kết nối SQL Server');
+  console.log('✅ Đã kết nối SQL Server thành công!');
 
-  // API: Ghi user + lịch sử
+  // ================== API: Đăng nhập ==================
+  app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Thiếu username hoặc password' });
+    }
+
+    try {
+      const result = await pool.request()
+        .input('username', sql.VarChar(50), username)
+        .input('password', sql.VarChar(50), password)
+        .query(`
+          SELECT * FROM dbo.Accounts
+          WHERE username = @username AND password = @password
+        `);
+
+      if (result.recordset.length > 0) {
+        console.log(`Đăng nhập thành công: ${username}`);
+        res.json({ success: true, message: 'Đăng nhập thành công!' });
+      } else {
+        res.status(401).json({ success: false, message: 'Sai tài khoản hoặc mật khẩu!' });
+      }
+
+    } catch (err) {
+      console.error('Lỗi truy vấn đăng nhập:', err);
+      res.status(500).json({ success: false, message: 'Lỗi hệ thống khi đăng nhập' });
+    }
+  });
+
+  // ================== API: Ghi user + lịch sử ==================
   app.post('/user', async (req, res) => {
     const { id, name } = req.body;
     const createdAt = new Date();
@@ -68,11 +98,11 @@ sql.connect(config).then(pool => {
     }
   });
 
-  // API: Lấy lịch sử
+  // ================== API: Lấy lịch sử ==================
   app.get('/history', async (req, res) => {
     try {
       const result = await pool.request().query(`
-        SELECT * FROM dbo.History ORDER BY CreatedAt DESC
+        SELECT * FROM dbo.History ORDER BY createdAt DESC
       `);
       res.json(result.recordset);
     } catch (err) {
@@ -92,7 +122,7 @@ sql.connect(config).then(pool => {
     }
 
     espCommand = { id, name, timestamp: Date.now() };
-    console.log("📥 Nhận lệnh từ App:", espCommand);
+    console.log("Nhận lệnh từ App:", espCommand);
 
     res.json({ success: true, message: 'Đã lưu lệnh, ESP sẽ nhận khi gọi /get-command' });
   });
@@ -100,8 +130,9 @@ sql.connect(config).then(pool => {
   // ESP gọi để lấy lệnh từ API
   app.get('/get-command', (req, res) => {
     if (espCommand) {
+      console.log("ESP lấy lệnh:", espCommand);
       res.json(espCommand);
-      espCommand = null; // xoá lệnh sau khi ESP đã lấy
+      espCommand = null; // Xóa lệnh sau khi ESP đã lấy
     } else {
       res.json({ id: null, name: null });
     }
