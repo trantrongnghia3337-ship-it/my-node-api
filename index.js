@@ -1,9 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const sql = require('mssql');
-const dotenv = require('dotenv');
+import express from 'express';
+import cors from 'cors';
+import sql from 'mssql';
+import dotenv from 'dotenv';
 dotenv.config();
-
 
 const app = express();
 const port = process.env.PORT || 3000;
