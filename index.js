@@ -1,8 +1,9 @@
-import express from 'express';
-import cors from 'cors';
-import sql from 'mssql';
-import dotenv from 'dotenv';
+const express = require('express');
+const cors = require('cors');
+const sql = require('mssql');
+const dotenv = require('dotenv');
 dotenv.config();
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,9 +27,9 @@ app.use(express.json());
 
 // ================== MAIN ==================
 sql.connect(config).then(pool => {
-  console.log('✅ Đã kết nối SQL Server thành công!');
-
-  // ================== API: Đăng nhập ==================
+  console.log('Kết nối SQL Server thành công!');
+  
+// ================== API: Đăng nhập =========
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -111,32 +112,7 @@ sql.connect(config).then(pool => {
     }
   });
 
-  // ================== MỞ RỘNG ESP32 ==================
-  let espCommand = null;
-
-  // App gửi lệnh cho ESP qua API
-  app.post('/send-to-esp', (req, res) => {
-    const { id, name } = req.body;
-    if (!id || !name) {
-      return res.status(400).json({ error: 'Thiếu ID hoặc Name' });
-    }
-
-    espCommand = { id, name, timestamp: Date.now() };
-    console.log("Nhận lệnh từ App:", espCommand);
-
-    res.json({ success: true, message: 'Đã lưu lệnh, ESP sẽ nhận khi gọi /get-command' });
-  });
-
-  // ESP gọi để lấy lệnh từ API
-  app.get('/get-command', (req, res) => {
-    if (espCommand) {
-      console.log("ESP lấy lệnh:", espCommand);
-      res.json(espCommand);
-      espCommand = null; // Xóa lệnh sau khi ESP đã lấy
-    } else {
-      res.json({ id: null, name: null });
-    }
-  });
+ 
 
   // ================== KHỞI ĐỘNG SERVER ==================
   app.listen(port, "0.0.0.0", () => {
