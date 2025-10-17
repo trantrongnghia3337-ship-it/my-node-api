@@ -17,6 +17,6 @@
   "path-to-regexp": "^6.2.1"
 },
   "engines": {
-    "node": "20.x"
+    "node": ">=20.x"
   }
 }
